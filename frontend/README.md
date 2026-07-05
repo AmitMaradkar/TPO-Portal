@@ -2,5 +2,22 @@
 
 
 
-https://user-images.githubusercontent.com/78370367/225818376-66795bc3-976c-4c87-a475-692d15fd21f2.mp4
+This is the frontend of the College Training and Placement Platform.
+
+## Tech Stack
+
+- React.js
+- Bootstrap
+- Axios
+
+## Features
+
+- Admin Login
+- Student Login
+- Company Management
+- Student Registration
+- Placement Tracking
+- Report Generation
+
+
 
