@@ -1,7 +1,8 @@
 import axios from "axios";
+import API_BASE_URL from "../../../config/api";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import ReactHTMLTableToExcel from "react-html-table-to-excel";
+import * as XLSX from "xlsx";
 import "../../../assets/css/admincompanytable.css";
 
 const AdminStudentRoundTable = () => {
@@ -27,14 +28,12 @@ const AdminStudentRoundTable = () => {
     setLoading(true);
     axios
       .get(
-        `http://localhost:8080/admin/company/${params.listType}/${params.roundNo}/${params.jobId}`,
+        `${API_BASE_URL}/admin/company/${params.listType}/${params.roundNo}/${params.jobId}`,
         { withCredentials: true }
       )
       .then((res) => {
-        console.log("res", res.data.data);
-        setStudentTable(res.data.data);
-
-        res.data.data.map((student) => {
+        setStudentTable(res.data.data || []);
+        res.data.data?.map((student) => {
           setRoundDetails({
             ...roundDetails,
             disqualifiedStudentIds: [
@@ -46,7 +45,7 @@ const AdminStudentRoundTable = () => {
         setLoading(false);
       })
       .catch((err) => {
-        // console.log("err", err);
+        setLoading(false);
       });
   }, []);
 
@@ -61,8 +60,8 @@ const AdminStudentRoundTable = () => {
   }
 
   const handleUpdateRound = async () => {
-    setLoading(true)
-    await axios.post('http://localhost:8080/company/job/round/result/declare', roundDetails, {withCredentials:true})
+    setLoading(true);
+    await axios.post(`${API_BASE_URL}/company/job/round/result/declare`, roundDetails, {withCredentials:true})
     .then((res)=>{
       setLoading(false);
       // console.log("res bdhs: ",res);
@@ -77,6 +76,14 @@ const AdminStudentRoundTable = () => {
         setLoading(false);
     })
   }
+
+  const handleDownloadExcel = () => {
+    const table = document.getElementById("table-to-xls");
+    if (!table) return;
+
+    const workbook = XLSX.utils.table_to_book(table);
+    XLSX.writeFile(workbook, `${params.companyName}-Round-${params.roundNo}-${params.listType}.xlsx`);
+  };
 
   return (
     <div id="adminCOmpanyTable">
@@ -114,14 +121,9 @@ const AdminStudentRoundTable = () => {
           </form> */}
 
           <div className="col-md-3" style={{ marginTop: "34px" }}>
-            <ReactHTMLTableToExcel
-              id="test-table-xls-button"
-              className="btn btn-success"
-              table="table-to-xls"
-              filename={`${params.companyName}-Round-${params.roundNo}-${params.listType}`}
-              sheet="tablexlsx"
-              buttonText="Download Excel"
-            />
+            <button className="btn btn-success" onClick={handleDownloadExcel}>
+              Download Excel
+            </button>
           </div>
          
         </div>

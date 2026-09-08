@@ -1,57 +1,49 @@
 import { useState } from "react";
-
-// import axios from "axios";
-// import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import API_BASE_URL from "../../../config/api";
 
 const AddadminForm = () => {
+  const [admin, setAdmin] = useState({
+    email: "",
+    password: "",
+  });
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-    const [admin, setAdmin] = useState({
-        email: "",
-        password: "",
-      });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    //   const navigate = useNavigate();
+    if (admin.password !== confirmPassword) {
+      alert("Both the passwords should match!");
+      return;
+    }
 
-      const handleSubmit = (e) => {
-        e.preventDefault();
+    try {
+      await axios.post(`${API_BASE_URL}/admin/signup`, admin, { withCredentials: true });
+      alert("Admin added successfully!");
+      setAdmin({ email: "", password: "" });
+      setConfirmPassword("");
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to add admin");
+    }
+  };
 
-        var pass1 = document.getElementById("validationCustom03").value;
-        var pass2 = document.getElementById("validationCustom089").value;
-
-        if(pass1===pass2){
-            // await axios.post('http://localhost:8080/company/add', company,{withCredentials:true})
-            // .then((res)=>{
-            //   // console.log("Res: ",res);
-            //   alert("Company added successfully!");
-            //   // window.location.reload();
-            //   navigate("/admin/company-table");
-            // })
-            // .catch((err)=>{
-            //   // console.log("err: ",err);
-            // })
-        }else{
-            alert("Both the passwords should match!");
-        }
-      }
-
-    return ( 
-<div className="modal fade" id="addadminform" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div className="modal-dialog">
-    <div className="modal-content">
-      <div className="modal-header">
-        <h5 className="modal-title" id="staticBackdropLabel">Fill the admin details</h5>
-        <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div className="modal-body">
-      <form onSubmit={handleSubmit}>
+  return (
+    <div className="modal fade" id="addadminform" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div className="modal-dialog">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h5 className="modal-title" id="staticBackdropLabel">Fill the admin details</h5>
+            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div className="modal-body">
+            <form onSubmit={handleSubmit}>
               <p style={{ fontSize: "15px" }}>
                 <span style={{ color: "red" }}>*</span> All fields are mandatory
               </p>
               <hr />
-              {/* <form className="row g-3 needs-validation" onSubmit={handleSubmit}> */}
-              <h5>About company</h5>
-             <div className="row" id="companyFormadd">
-                <div className="col-md-10">
+              <h5>About Admin</h5>
+              <div className="row" id="companyFormadd">
+                <div className="col-md-10 mb-3">
                   <label htmlFor="validationCustom02" className="form-label">
                     Admin email<span style={{ color: "red" }}>*</span>
                   </label>
@@ -67,7 +59,7 @@ const AddadminForm = () => {
                     required
                   />
                 </div>
-             <div className="col-md-10">
+                <div className="col-md-10 mb-3">
                   <label htmlFor="validationCustom03" className="form-label">
                     Secure password<span style={{ color: "red" }}>*</span>
                   </label>
@@ -82,38 +74,39 @@ const AddadminForm = () => {
                     id="validationCustom03"
                     required
                   />
-            </div>
+                </div>
 
-            <div className="col-md-10">
+                <div className="col-md-10 mb-3">
                   <label htmlFor="validationCustom089" className="form-label">
                     Confirm password<span style={{ color: "red" }}>*</span>
                   </label>
                   <input
                     type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     className="form-control"
                     placeholder="Confirm password"
                     id="validationCustom089"
                     required
                   />
-            </div>
+                </div>
 
-<hr className="my-2" />
-             <div className="col-md-12 mx-3 my-2">
+                <hr className="my-2" />
+                <div className="col-md-12 mx-3 my-2">
                   <button className="btn btn-primary" type="submit">
                     Add admin
                   </button>
-            </div>
-
+                </div>
+              </div>
+            </form>
+          </div>
+          <div className="modal-footer">
+            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
         </div>
-        </form>
-      </div>
-      <div className="modal-footer">
-        <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
-  </div>
-</div>
-     );
-}
- 
+  );
+};
+
 export default AddadminForm;

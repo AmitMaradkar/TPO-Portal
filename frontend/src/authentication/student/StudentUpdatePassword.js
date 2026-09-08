@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "../../assets/css/StudentUpdatePassword.css";
-const axios = require("axios");
+import API_BASE_URL from "../../config/api";
 
-const StudentCompanyTable = () => {
+const StudentUpdatePassword = () => {
   const [curPass, setCurPass] = useState("");
   const [newPass, setNewPass] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
@@ -12,7 +13,6 @@ const StudentCompanyTable = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    //validate whether newPass and confirmPass are same:
     if (newPass !== confirmPass) {
       alert("Passwords do not match!");
       setNewPass("");
@@ -20,53 +20,24 @@ const StudentCompanyTable = () => {
       return;
     }
 
-    //making an axios post request to backend to update the password:
-
-    await axios
-      .post(
-        "http://localhost:8080/student/password/update",
+    try {
+      const res = await axios.post(
+        `${API_BASE_URL}/student/password/update`,
         {
           oldPassword: curPass,
           newPassword: newPass,
         },
         { withCredentials: true }
-      )
-      .then((res) => {
-        if (res.status === 200) {
-          alert("Password changed successfully!");
-          return navigate("/student/dashboard");
-          // console.log('sucessful login')
-        } else {
-          // console.log(res);
-          return alert("Old Password did not matched");
-        }
-      })
-      .catch((err) => {
-        if (err.response.data === "Passwords do not match") {
-          alert("Old password does not match!");
-        }
-      });
+      );
 
-    // const res = await axios.post(
-    //   "http://localhost:8080/student/password/update",
-    //   {
-    //     oldPassword: curPass,
-    //     newPassword: newPass,
-    //   },
-    //   { withCredentials: true }
-    // );
-
-    // console.log("res: ", res);
-
-    // if (res.status === 200) {
-    //   alert("Password changed successfully!");
-    //   return navigate("/student/dashboard");
-    //   // console.log('sucessful login')
-    // } else {
-    //   console.log(res);
-    //   return alert("Old Password did not matched");
-    // }
-    //navigate the user to signin page:
+      if (res.status === 200) {
+        alert("Password changed successfully!");
+        navigate("/student/dashboard");
+      }
+    } catch (err) {
+      const msg = err.response?.data?.message || err.response?.data || "Old password did not match";
+      alert(msg);
+    }
   };
 
   return (
@@ -83,6 +54,7 @@ const StudentCompanyTable = () => {
                 type="password"
                 className="form-control mt-1"
                 placeholder="Enter Current Password"
+                required
               />
             </div>
 
@@ -94,6 +66,7 @@ const StudentCompanyTable = () => {
                 type="password"
                 className="form-control mt-1"
                 placeholder="Enter New Password"
+                required
               />
             </div>
 
@@ -105,6 +78,7 @@ const StudentCompanyTable = () => {
                 type="password"
                 className="form-control mt-1"
                 placeholder="Confirm New Password"
+                required
               />
             </div>
 
@@ -120,4 +94,4 @@ const StudentCompanyTable = () => {
   );
 };
 
-export default StudentCompanyTable;
+export default StudentUpdatePassword;

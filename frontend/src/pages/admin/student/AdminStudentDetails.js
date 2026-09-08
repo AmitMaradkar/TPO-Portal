@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import API_BASE_URL from "../../../config/api";
 
 import "../../../assets/css/studentprofile.css"
 
@@ -16,14 +17,12 @@ const AdminStudentDetails = () => {
 
 
     useEffect(() => {
-        axios.get(`http://localhost:8080/admin/student/profile/${params.studentId}`, { withCredentials: true })
+        axios.get(`${API_BASE_URL}/admin/student/profile/${params.studentId}`, { withCredentials: true })
             .then((res) => {
-                // console.log('After get request:', res.data);
-                setStudent(res.data.data);
+                setStudent(res.data.data || {});
                 setLoading(false);
             })
             .catch((err) => {
-                // console.log('Error in get req:', err);
                 setLoading(false);
             })
     }, []);

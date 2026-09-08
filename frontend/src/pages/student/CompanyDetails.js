@@ -1,66 +1,43 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API_BASE_URL from "../../config/api";
 import "../../assets/css/studentprofile.css";
 import { Link, useNavigate, useParams } from "react-router-dom";
-// import { useToasts } from "react-toast-notifications";
 
 const CompanyDetails = () => {
   const [isLoading, setLoading] = useState(true);
   const [application, setApplication] = useState(null);
   const [eligiblity, setEligiblity] = useState({});
   const [resume, setResume] = useState(null);
-  // const [fileAvailable, setFileAvailable] = useState(true);
-  // const [fileError, setFileError] = useState("");
 
   const navigate = useNavigate();
-  // const { addToast } = useToasts(); //react toast notifications:
   const params = useParams();
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/student/job/details/${params.jobId}`, {
+      .get(`${API_BASE_URL}/student/job/details/${params.jobId}`, {
         withCredentials: true,
       })
       .then((res) => {
-        //console.log("After get request:", res.data.data);
         setApplication(res.data.data);
         setLoading(false);
       })
       .catch((err) => {
-        // console.log("Error in get req:", err);
         setLoading(false);
       });
 
-      // axios
-      // .get(`http://localhost:8080/student/company/job/eligiblity/${params.jobId}`, {
-      //   withCredentials: true,
-      // })
-      // .then((res) => {
-      //   console.log("After get request:", res.data.data);
-      //   // const temp = res.data.data;
-      //   setFileAvailable(true);
-      //   setLoading(false);
-      // })
-      // .catch((err) => {
-      //   setFileAvailable(false);
-      //   setFileError(err.response.data.message);
-      //   setLoading(false);
-      // });
-
     axios
       .get(
-        `http://localhost:8080/student/company/job/eligiblity/${params.jobId}`,
+        `${API_BASE_URL}/student/company/job/eligiblity/${params.jobId}`,
         {
           withCredentials: true,
         }
       )
       .then((res) => {
-        // console.log("After get request:", res.data.data);
         setLoading(false);
         setEligiblity(res.data.data);
       })
       .catch((err) => {
-        // console.log("Error in get req:", err);
         setLoading(false);
       });
   }, [params.jobId]);
@@ -74,10 +51,9 @@ const CompanyDetails = () => {
     e.preventDefault();
     setLoading(true);
     if (resume) {
-      // console.log(application._id);
       axios
         .post(
-          "http://localhost:8080/student/company/job/apply",
+          `${API_BASE_URL}/student/company/job/apply`,
           { jobId: application._id },
           { withCredentials: true }
         )
@@ -90,7 +66,7 @@ const CompanyDetails = () => {
           };
           axios
             .post(
-              `http://localhost:8080/student/resume/upload/${application._id}`,
+              `${API_BASE_URL}/student/resume/upload/${application._id}`,
               formData,
               config
             )
@@ -151,7 +127,7 @@ const CompanyDetails = () => {
                 </div>
                 {/* {fileAvailable ? (
                   <iframe
-                    src={`http://localhost:8080/student/job/files/${params.jobId}`}
+                    src={`${API_BASE_URL}/student/job/files/${params.jobId}`}
                     frameborder="0"
                   ></iframe>
                 ) : (

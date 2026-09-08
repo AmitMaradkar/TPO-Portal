@@ -8,12 +8,10 @@ import Team from "./components/utilities/Team";
 import Footer from "./components/utilities/Footer";
 
 //auth
-import ForgotPassword from "./authentication/ForgotPassword";
 import RequireAuth from "./authentication/RequireAuth";
 
 //admin/auth
 import AdminUpdatePassword from "./authentication/admin/AdminUpdatePassword";
-import AdminResetPassword from "./authentication/admin/AdminResetPassword";
 
 //admin/dashboard
 import AdminSidebar from "./components/adminDashboard/AdminSidebar";
@@ -35,7 +33,6 @@ import AdminCompanyDetails from "./pages/admin/Company/AdminCompanyDetails";
 import GenerateReport from "./pages/admin/GenerateReport";
 
 //student/auth
-import StudentResetPassword from "./authentication/student/StudentResetPassword";
 import StudentUpdatePassword from "./authentication/student/StudentUpdatePassword";
 import Unauthorized from "./authentication/Unauthorized";
 
@@ -57,18 +54,12 @@ function App() {
       <Routes>
         <Route index path="*" element={<LoginForm />} />
         <Route path="team" element={<Team />} />
-        <Route path="password/forgot" element={<ForgotPassword />} />
-        <Route
-          path="admin/password/reset/:token/:id"
-          element={<AdminResetPassword />}
-        />
 
         <Route element={<RequireAuth allowedRoles="admin" />}>
           <Route path="admin" element={<AdminSidebar />}>
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="student-table" element={<AdminStudentTable />} />
             <Route path="placedStudents" element={<PlacedStudentTable />} />
-            {/* <Route path="student-filter" element={<StudentFilter />} /> */}
             <Route path="company-table" element={<AdminCompanyTable />} />
             <Route path="add-company" element={<BasicForm />} />
             <Route path="add-job" element={<AddJobOpen />} />
@@ -82,11 +73,6 @@ function App() {
             <Route path="password/update" element={<AdminUpdatePassword />} />
           </Route>
         </Route>
-
-        <Route
-          path="student/password/reset/:token/:id"
-          element={<StudentResetPassword />}
-        />
 
         <Route element={<RequireAuth allowedRoles="student" />}>
           <Route path="student" element={<StudentSidebar />}>

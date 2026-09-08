@@ -278,11 +278,6 @@ const studentSchema = new mongoose.Schema(
     },
     //Ug and Pg boolean
     isUg: { type: Boolean, default: true },
-
-    //new fields :
-    resetPasswordToken: String,
-    resetPasswordExpire: Date,
-    resetPasswordTokenForForgotPassword: String,
   }, 
   {id: false, timestamps: true}
 );

@@ -3,6 +3,7 @@ import "../../../../assets/css/admincompanytable.css";
 import "../../../../assets/css/studentprofile.css";
 import {  useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import API_BASE_URL from "../../../../config/api";
 
 
 const AddJobOpen = () => {
@@ -176,12 +177,11 @@ const AddJobOpen = () => {
     e.preventDefault();
     setLoading(true);
     if (jobFile) {
-      await axios.post('http://localhost:8080/company/job/add', company, { withCredentials: true })
+      await axios.post(`${API_BASE_URL}/company/job/add`, company, { withCredentials: true })
         .then(async (res) => {
-          // console.log("Res: ", res.data.data);
           let formData = new FormData();;
           formData.append("job-file", jobFile)
-          await axios.post(`http://localhost:8080/job/files/${res.data.data.companyId}/${res.data.data._id}`, formData, { withCredentials: true, headers: { "content-type": "multipart/form-data" } })
+          await axios.post(`${API_BASE_URL}/job/files/${res.data.data.companyId}/${res.data.data._id}`, formData, { withCredentials: true, headers: { "content-type": "multipart/form-data" } })
             .then(res => {
               alert("File Uploaded Successfully");
               setLoading(false);

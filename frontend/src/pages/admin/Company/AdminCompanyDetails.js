@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import API_BASE_URL from "../../../config/api";
 import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import "../../../assets/css/studentprofile.css";
 
@@ -14,41 +15,35 @@ const AdminCompanyDetails = () => {
     const handleNewRound = async (e) => {
         e.preventDefault();
 
-        await axios.post('http://localhost:8080/company/job/round/add', newRound, { withCredentials: true })
+        await axios.post(`${API_BASE_URL}/company/job/round/add`, newRound, { withCredentials: true })
             .then((res) => {
-                // console.log('After adding new round: ', res);
                 alert("Added new round successfully!");
                 window.location.reload();
             })
             .catch((err) => {
-                // console.log("Err: ", err);
             })
     }
 
     const handleUpdateRound = async (e) => {
         e.preventDefault();
 
-        await axios.post('http://localhost:8080/company/job/round/update', updateRound, { withCredentials: true })
+        await axios.post(`${API_BASE_URL}/company/job/round/update`, updateRound, { withCredentials: true })
             .then((res) => {
-                // console.log('After updating rounds: ', res);
                 alert("Updating round details was successfull!");
                 window.location.reload();
             })
             .catch((err) => {
-                // console.log("err: ", err);
             })
     }
 
     useEffect(() => {
         async function fetchData() {
-            await axios.get(`http://localhost:8080/admin/company/job/details/${params.jobId}`, { withCredentials: true })
+            await axios.get(`${API_BASE_URL}/admin/company/job/details/${params.jobId}`, { withCredentials: true })
                 .then((res) => {
-                    // console.log('After get request:', res.data.data);
                     setCompany(res.data.data);
                     setLoading(false);
                 })
                 .catch((err) => {
-                    // console.log('Error in get req:', err);
                     setLoading(false);
                 })
         }
@@ -105,7 +100,7 @@ const AdminCompanyDetails = () => {
         let confirm = prompt("Enter 'CONFIRM' to delete the job!: ", "");
 
         if (confirm === "CONFIRM") {
-            await axios.delete(`http://localhost:8080/company/job/delete/${params.jobId}`, { withCredentials: true })
+            await axios.delete(`${API_BASE_URL}/company/job/delete/${params.jobId}`, { withCredentials: true })
                 .then((res) => {
                     alert("Job delete successfully!");
                     navigate('/admin/company-table');

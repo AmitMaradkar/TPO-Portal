@@ -1,4 +1,5 @@
 import axios from 'axios';
+import API_BASE_URL from "../../../config/api";
 import * as XLSX from 'xlsx'
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -59,13 +60,11 @@ const AdminStudentTable = () => {
             const json = JSON.stringify(data);
             setLoading(true);
             // console.log(json)
-            axios.post('http://localhost:8080/admin/register/students', data, { withCredentials: true })
+            axios.post(`${API_BASE_URL}/admin/register/students`, data, { withCredentials: true })
                 .then(function (res) {
-                    // console.log(res);
                     setLoading(false);
                 })
                 .catch(function (error) {
-                    // console.log(error);
                     setLoading(false);
                 });
         }else{
@@ -74,14 +73,11 @@ const AdminStudentTable = () => {
     }
 
     useEffect(() => {
-        axios.get("http://localhost:8080/admin/student/all", { withCredentials: true })
+        axios.get(`${API_BASE_URL}/admin/student/all`, { withCredentials: true })
             .then((res) => {
-                // console.log('res', res.data.data);
-                setStudentTable(res.data.data);
+                setStudentTable(res.data.data || []);
                 setLoading(false);
-                // console.log(res.data)
             }).catch((err) => {
-                // console.log('err', err);
                 setLoading(false);
             })
     }, [])

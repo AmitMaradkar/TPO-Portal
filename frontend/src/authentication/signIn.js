@@ -1,21 +1,22 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../assets/css/login.css";
 import { useCookies } from "react-cookie";
+import API_BASE_URL from "../config/api";
 
 const LoginForm = () => {
   const navigate = useNavigate();
-  const [cookies, setCookie] = useCookies(["usertype", "username", "token1"]);
+  const [, setCookie] = useCookies(["usertype", "username", "token1"]);
 
   const [isLoading, setLoading] = useState(false);
 
-  const [alertMessage, setalertMessage] = React.useState({
+  const [alertMessage, setalertMessage] = useState({
     message: "",
     wholeAlert: "alert d-none alert-success",
   });
 
-  const [formValue, setformValue] = React.useState({
+  const [formValue, setformValue] = useState({
     email: "",
     password: "",
   });
@@ -23,38 +24,32 @@ const LoginForm = () => {
   const [usertype, setUserType] = useState("student");
 
   const formValidate = () => {
-    setLoading(true);
-    // console.log("Something");
     if (formValue.email === "") {
       setalertMessage({
         ...alertMessage,
         wholeAlert: "alert d-block alert-danger",
         message: "Email can't be empty!",
       });
-      // setLoading(false);
     } else if (formValue.password === "") {
       setalertMessage({
         ...alertMessage,
         wholeAlert: "alert d-block alert-danger",
         message: "Password can't be empty!",
       });
-      // setLoading(false);
     } else {
       setLoading(true);
       axios
-        .post(`http://localhost:8080/${usertype}/login`, formValue, {
+        .post(`${API_BASE_URL}/${usertype}/login`, formValue, {
           withCredentials: true,
         })
         .then((res) => {
-          // console.log("res.data", res.data);
-
           setalertMessage({
             ...alertMessage,
             wholeAlert: "alert d-block alert-success",
-            message: "Login successfull!",
+            message: "Login successful!",
           });
-          
-          setCookie("token1", res.data.token, { path: "/", maxAge: 43200 }); // 30 days
+
+          setCookie("token1", res.data.token, { path: "/", maxAge: 43200 });
           setCookie("usertype", `${usertype}`, { path: "/", maxAge: 43200 });
           setCookie("username", res.data?.student?.firstName, {
             path: "/",
@@ -64,12 +59,13 @@ const LoginForm = () => {
           navigate(`${usertype}/dashboard`);
         })
         .catch((err) => {
+          const errorMessage =
+            err.response?.data?.message || "Incorrect email and password combination!";
           setalertMessage({
             ...alertMessage,
             wholeAlert: "alert d-block alert-danger",
-            message: "Incorrect email and password combination!",
+            message: errorMessage,
           });
-          // console.log("errrr", err);
           setLoading(false);
         });
     }
@@ -164,9 +160,6 @@ const LoginForm = () => {
                 Student
               </label>
             </div>
-          </div>
-          <div style={{ textAlign: "right" }}>
-            <Link to="password/forgot">Forgot password</Link>
           </div>
           <br />
           <button onClick={formValidate} className="btn btn-primary">

@@ -1,7 +1,8 @@
 import axios from "axios";
+import API_BASE_URL from "../../../config/api";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+import * as XLSX from "xlsx";
 import "../../../assets/css/admincompanytable.css";
 import PdfGenerator from "../Company/pdf/PdfGenerator";
 
@@ -26,21 +27,59 @@ const PlacedStudentTable = () => {
     pg: true,
   });
 
+  const getPlacedCompanyName = (student) => {
+    if (student.GT20?.status && student.GT20?.jobId) {
+      return (
+        student.GT20.jobId.companyId?.name ||
+        student.GT20.jobId.company?.name ||
+        student.GT20.jobId.name ||
+        "N/A"
+      );
+    }
+    if (student.LTE20?.status && student.LTE20?.jobId) {
+      return (
+        student.LTE20.jobId.companyId?.name ||
+        student.LTE20.jobId.company?.name ||
+        student.LTE20.jobId.name ||
+        "N/A"
+      );
+    }
+    if (student.applications && student.applications.length > 0) {
+      const selectedApp = student.applications.find(
+        (app) => app.studentResult && app.studentRoundCleared > 0
+      );
+      if (selectedApp?.jobId?.companyId?.name) {
+        return selectedApp.jobId.companyId.name;
+      }
+      if (selectedApp?.job?.[0]?.company?.[0]?.name) {
+        return selectedApp.job[0].company[0].name;
+      }
+    }
+    return "N/A";
+  };
+
   useEffect(() => {
     axios
-      .get("http://localhost:8080/admin/student/placed", {
+      .get(`${API_BASE_URL}/admin/student/placed`, {
         withCredentials: true,
       })
       .then((res) => {
-        setStudentTable(res.data.data);
-        // console.log(res.data.data);
+        setStudentTable(res.data.data || []);
         setLoading(false);
       })
       .catch((err) => {
-        // console.log("err", err);
         setLoading(false);
       });
   }, []);
+
+  const handleDownloadExcel = () => {
+    const table = document.getElementById("table-to-xls");
+    if (!table) return;
+
+    const workbook = XLSX.utils.table_to_book(table);
+    const filename = 'Course-[ '+(course.pg ? 'PG ': '')+(course.ug ? 'UG': '')+ ' ] Branch-[ ' +(branch.cs ? 'CS ': '')+(branch.it ? 'IT ': '')+(branch.entc ? 'ENTC ': '')+'] - '+'Placed Students' + '.xlsx';
+    XLSX.writeFile(workbook, filename);
+  };
 
   if (isLoading) {
     return (
@@ -229,17 +268,13 @@ const PlacedStudentTable = () => {
         </div>
       </div>
 
-      <ReactHTMLTableToExcel
-        id="test-table-xls-button"
-        className="btn btn-success my-3"
-        table="table-to-xls"
-        filename={'Course-[ '+(course.pg ? 'PG ': '')+(course.ug ? 'UG': '')+ ' ] Branch-[ ' +(branch.cs ? 'CS ': '')+(branch.it ? 'IT ': '')+(branch.entc ? 'ENTC ': '')+'] - '+'Placed Students'}
-        sheet="tablexlsx"
-        buttonText="Download Excel"/>
+      <button className="btn btn-success my-3" onClick={handleDownloadExcel}>
+        Download Excel
+      </button>
 
-        <button className="btn btn-secondary mx-2" onClick={()=>{PdfGenerator(studentTable)}}>
-          Download PDF
-        </button>
+      <button className="btn btn-secondary mx-2" onClick={()=>{PdfGenerator(studentTable)}}>
+        Download PDF
+      </button>
 
       <table id="table-to-xls" className="table table-hover">
         <thead className="table-dark darkRow">
@@ -255,16 +290,19 @@ const PlacedStudentTable = () => {
         </thead>
         <tbody>
           {studentTable
-            .filter(
-              (student) =>
-                ((course.ug ? student.isUg == true : console.log("")) ||
-                  (course.pg ? student.isUg == false : console.log(""))) &&
-                ((branch.cs ? student.branch == "cs" : console.log("")) ||
-                  (branch.it ? student.branch == "it" : console.log("")) ||
-                  (branch.entc
-                    ? student.branch == "entc"
-                    : console.log("")))
-            )
+            .filter((student) => {
+              const b = (student.branch || "").toLowerCase();
+              const isCs = b === "cs" || b === "ce" || b.includes("comp");
+              const isIt = b === "it" || b.includes("info");
+              const isEntc = b === "entc" || b === "etc" || b.includes("elect") || b.includes("telecom");
+              const matchesBranch =
+                (branch.cs && isCs) ||
+                (branch.it && isIt) ||
+                (branch.entc && isEntc);
+              const matchesCourse =
+                (course.ug && student.isUg) || (course.pg && !student.isUg);
+              return matchesCourse && matchesBranch;
+            })
             .filter((student) =>
               student.firstName
                 .toLowerCase()
@@ -279,7 +317,7 @@ const PlacedStudentTable = () => {
                 </td>
                 <td>{student.phone}</td>
                 <td>{student.branch}</td>
-                <td> PhonePe</td>
+                <td>{getPlacedCompanyName(student)}</td>
                 <td>
                   <Link to="#" onClick={(e)=>{e.preventDefault(); navigate(`/admin/student/profile/${student._id}`)}}>View</Link>
                 </td>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../../assets/css/admincompanytable.css";
 import axios from "axios";
+import API_BASE_URL from "../../config/api";
 
 const StudentCompanyTable = () => {
   const [studentCompanyTable, setStudentCompanyTable] = useState([]);
@@ -13,16 +14,14 @@ const StudentCompanyTable = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8080/student/company/jobs", {
+      .get(`${API_BASE_URL}/student/company/jobs`, {
         withCredentials: true,
       })
       .then((res) => {
-        // console.log('res', res.data.data);
-        setStudentCompanyTable(res.data.data);
+        setStudentCompanyTable(res.data.data || []);
         setLoading(false);
       })
       .catch((err) => {
-        // console.log("err", err);
         setLoading(false);
       });
   }, []);

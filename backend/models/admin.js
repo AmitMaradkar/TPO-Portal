@@ -18,11 +18,6 @@ const adminSchema = new mongoose.Schema(
       required: true,
       minlength: 6,
     },
-
-    //new fields :
-    resetPasswordToken: String,
-    resetPasswordExpire: Date,
-    resetPasswordTokenForForgotPassword: String,
   },
   { id: false, timestamps: true }
 );

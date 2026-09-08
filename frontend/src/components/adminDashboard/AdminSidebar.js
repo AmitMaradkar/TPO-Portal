@@ -1,14 +1,15 @@
-import React, { useState } from "react";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import "../../assets/css/style.css";
 import { useCookies } from "react-cookie";
 import AddadminForm from "../../pages/admin/addAdmin/addAdminForm";
+import API_BASE_URL from "../../config/api";
 
 export default function AdminSidebar() {
-
   const navigate = useNavigate();
-  const [cookies, setCookie] = useCookies();
+  const location = useLocation();
+  const [, setCookie] = useCookies();
 
   const [active, setActive] = useState({
     dash: 'active',
@@ -17,56 +18,44 @@ export default function AdminSidebar() {
     changePass: '',
     placeStudent: '',
     report: ''
-  })
+  });
 
-
-  function setActiveTag() {
-    var initial_url = window.location.href;
-    var url = initial_url.split('/');
-
-    var path = url[url.length - 1];
+  useEffect(() => {
+    const path = location.pathname.split('/').pop();
     if (path === 'dashboard') {
-      setActive({ ...active, dash: 'active', company: '', student: '', changePass: '', placeStudent: '', report: '' });
+      setActive({ dash: 'active', company: '', student: '', changePass: '', placeStudent: '', report: '' });
     } else if (path === 'student-table') {
-      setActive({ ...active, dash: '', company: '', student: 'active', changePass: '', placeStudent: '', report: '' });
+      setActive({ dash: '', company: '', student: 'active', changePass: '', placeStudent: '', report: '' });
     } else if (path === 'company-table') {
-      setActive({ ...active, dash: '', company: 'active', student: '', changePass: '', placeStudent: '', report: '' });
+      setActive({ dash: '', company: 'active', student: '', changePass: '', placeStudent: '', report: '' });
     } else if (path === 'update') {
-      setActive({ ...active, dash: '', company: '', student: '', changePass: 'active', placeStudent: '', report: '' });
+      setActive({ dash: '', company: '', student: '', changePass: 'active', placeStudent: '', report: '' });
     } else if (path === 'placedStudents') {
-      setActive({ ...active, dash: '', company: '', student: '', changePass: '', placeStudent: 'active', report: '' });
+      setActive({ dash: '', company: '', student: '', changePass: '', placeStudent: 'active', report: '' });
     } else if (path === 'generate-report') {
-      setActive({ ...active, dash: '', company: '', student: '', changePass: '', placeStudent: '', report: 'active' });
+      setActive({ dash: '', company: '', student: '', changePass: '', placeStudent: '', report: 'active' });
     } else {
-      setActive({ ...active, dash: '', company: '', student: '', changePass: '', placeStudent: '', report: '' })
+      setActive({ dash: '', company: '', student: '', changePass: '', placeStudent: '', report: '' });
     }
-  }
+  }, [location]);
 
-
-const hideDashBoard = () =>{
-  var toggleBtn = document.getElementById("navBarBtn");
-  toggleBtn.click();
-}
-
-
-  setInterval(() => {
-    setActiveTag();
-  }, 10)
+  const hideDashBoard = () => {
+    const toggleBtn = document.getElementById("navBarBtn");
+    if (toggleBtn) {
+      toggleBtn.click();
+    }
+  };
 
   const handleSignOut = () => {
-    axios.post("http://localhost:8080/admin/logout", {}, { withCredentials: true })
-      .then(res => {
-        // console.log("Admin Logout");
+    axios.post(`${API_BASE_URL}/admin/logout`, {}, { withCredentials: true })
+      .then(() => {
         setCookie("usertype", "", { path: "/" });
         setCookie("token1", "", { path: "/" });
         setCookie("username", "", { path: "/" });
-        console.log(cookies)
         navigate("/");
       })
-      .catch(err => {
-        // console.log("Error ", err);
-      })
-  }
+      .catch(() => {});
+  };
 
   return (
     <div>
@@ -90,7 +79,7 @@ const hideDashBoard = () =>{
           <span className="navbar-toggler-icon"></span>
         </button>
       </header>
-      <div className="">
+      <div>
         <div className="container-fluid">
           <div className="row">
             <nav
@@ -101,100 +90,49 @@ const hideDashBoard = () =>{
                 <ul className="nav flex-column">
                   <li className="nav-item" onClick={hideDashBoard}>
                     <Link className={`nav-link ${active.dash}`} aria-current="page" to="/admin/dashboard">
-                      <span
-                        data-feather="home"
-                        className="align-text-bottom"
-                      ></span>
-                      <i className="bi bi-house"></i>
-                      Dashboard
+                      <i className="bi bi-house"></i> Dashboard
                     </Link>
                   </li>
                   <li className="nav-item" onClick={hideDashBoard}>
                     <Link className={`nav-link ${active.student}`} to="/admin/student-table" >
-                      <span
-                        data-feather="file"
-                        className="align-text-bottom"
-                      ></span>
-                      <i className="bi bi-person"></i>
-                      Students
+                      <i className="bi bi-person"></i> Students
                     </Link>
                   </li>
                   <li className="nav-item" onClick={hideDashBoard}>
                     <Link className={`nav-link ${active.placeStudent}`} to="/admin/placedStudents" >
-                      <span
-                        data-feather="file"
-                        className="align-text-bottom"
-                      ></span>
-                      <i className="bi bi-mortarboard"></i>
-                      Placed Students
+                      <i className="bi bi-mortarboard"></i> Placed Students
                     </Link>
                   </li>
                   <li className="nav-item" onClick={hideDashBoard}>
                     <Link className={`nav-link ${active.company}`} to="/admin/company-table">
-                      <span
-                        data-feather="shopping-cart"
-                        className="align-text-bottom"
-                      ></span>
-                      <i className="bi bi-building"></i>
-                      Company
+                      <i className="bi bi-building"></i> Company
                     </Link>
                   </li>
                   <li className="nav-item" onClick={hideDashBoard}>
                     <Link className={`nav-link ${active.report}`} to="/admin/generate-report">
-                      <span
-                        data-feather="shopping-cart"
-                        className="align-text-bottom"
-                      ></span>
-                      <i className="bi bi-clipboard2-data"></i>
-                      Generate Report
+                      <i className="bi bi-clipboard2-data"></i> Generate Report
                     </Link>
                   </li>
                 </ul>
 
                 <h6 className="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
                   <span>Manage Account</span>
-                  <Link
-                    className="link-secondary"
-                    to="#"
-                    aria-label="Add a new report"
-                  >
-                    <span
-                      data-feather="plus-circle"
-                      className="align-text-bottom"
-                    ></span>
-                  </Link>
                 </h6>
                 <ul className="nav flex-column mb-2">
- 
-                <li className="nav-item" data-bs-toggle="modal" data-bs-target="#addadminform" onClick={hideDashBoard}>
-                  <Link className={`nav-link`} to="#">
-                        <span
-                          data-feather="file-text"
-                          className="align-text-bottom"
-                        ></span>
-                        <i class="bi bi-person-rolodex"></i>
-                        Add admin
-                  </Link>
+                  <li className="nav-item" data-bs-toggle="modal" data-bs-target="#addadminform" onClick={hideDashBoard}>
+                    <Link className="nav-link" to="#">
+                      <i className="bi bi-person-rolodex"></i> Add admin
+                    </Link>
                   </li>
                   
                   <li className="nav-item" onClick={hideDashBoard}>
                     <Link className={`nav-link ${active.changePass}`} to="/admin/password/update" >
-                      <span
-                        data-feather="file-text"
-                        className="align-text-bottom"
-                      ></span>
-                      <i className="bi bi-key"></i>
-                      Change Password
+                      <i className="bi bi-key"></i> Change Password
                     </Link>
                   </li>
                   <li className="nav-item" onClick={handleSignOut}>
                     <Link className="nav-link" to="/">
-                      <span
-                        data-feather="file-text"
-                        className="align-text-bottom"
-                      ></span>
-                      <i className="bi bi-box-arrow-right"></i>
-                      Sign Out
+                      <i className="bi bi-box-arrow-right"></i> Sign Out
                     </Link>
                   </li>
                 </ul>

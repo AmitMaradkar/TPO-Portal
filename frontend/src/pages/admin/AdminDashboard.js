@@ -5,23 +5,22 @@ import "../../assets/css/studentdashboardhome.css";
 import { Link } from "react-router-dom";
 import BranchPieChart from "./Company/charts/BranchPiChart";
 import BarChart from "./Company/charts/BarChart";
+import API_BASE_URL from "../../config/api";
 
 export default function AdminDashboard() {
-  const [dashboardDetials, setDashboardDetials] = useState({});
+  const [dashboardDetails, setDashboardDetails] = useState({});
   const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
     axios
-      .get("http://localhost:8080/admin/dashboard/details", {
+      .get(`${API_BASE_URL}/admin/dashboard/details`, {
         withCredentials: true,
       })
       .then((res) => {
-        setDashboardDetials(res.data.dashboard_details);
-        // console.log(res.data);
+        setDashboardDetails(res.data.dashboard_details || {});
         setLoading(false);
       })
-      .catch((err) => {
-        // console.log(err.data);
+      .catch(() => {
         setLoading(false);
       });
   }, []);
@@ -49,12 +48,11 @@ export default function AdminDashboard() {
               <div className="card text-center">
                 <div className="card-body">
                   <h5 className="card-title">Enrolled students</h5>
-                  <p className="card-text"></p>
                   <div className="col d-flex align-items-center">
                     <i className="bi bi-people"></i>
                     <div>
                       <h4 className="fw-bold mb-0">
-                        {dashboardDetials.totalStudents}
+                        {dashboardDetails.totalStudents || 0}
                       </h4>
                     </div>
                   </div>
@@ -70,12 +68,11 @@ export default function AdminDashboard() {
               <div className="card text-center">
                 <div className="card-body">
                   <h5 className="card-title">Visited companies</h5>
-                  <p className="card-text"></p>
                   <div className="col d-flex align-items-center">
                     <i className="bi bi-building"></i>
                     <div>
                       <h4 className="fw-bold mb-0">
-                        {dashboardDetials.totalCompanies}
+                        {dashboardDetails.totalCompanies || 0}
                       </h4>
                     </div>
                   </div>
@@ -91,12 +88,11 @@ export default function AdminDashboard() {
               <div className="card text-center">
                 <div className="card-body">
                   <h5 className="card-title">Placed students</h5>
-                  <p className="card-text"></p>
                   <div className="col d-flex align-items-center">
                     <i className="bi bi-mortarboard"></i>
                     <div>
                       <h4 className="fw-bold mb-0">
-                        {dashboardDetials.placedStudents}
+                        {dashboardDetails.placedStudents || 0}
                       </h4>
                     </div>
                   </div>
@@ -112,16 +108,14 @@ export default function AdminDashboard() {
               <div className="card text-center">
                 <div className="card-body">
                   <h5 className="card-title">Average CTC</h5>
-                  <p className="card-text"></p>
                   <div className="col d-flex align-items-center">
                     <i className="bi bi-currency-rupee"></i>
                     <div>
                       <h4 className="fw-bold mb-0">
-                        {dashboardDetials.avgSalaryBaggedByPlacedStudents !==
-                        null
+                        {dashboardDetails.avgSalaryBaggedByPlacedStudents != null
                           ? parseFloat(
-                              dashboardDetials.avgSalaryBaggedByPlacedStudents
-                            ).toFixed(3)
+                              dashboardDetails.avgSalaryBaggedByPlacedStudents
+                            ).toFixed(2)
                           : 0}{" "}
                         LPA
                       </h4>
@@ -130,29 +124,26 @@ export default function AdminDashboard() {
                 </div>
               </div>
             </Link>
+          </div>
+          <hr />
+          <div className="row">
+            <div className="col-md-4">
+              <BranchPieChart
+                csPlacedStudents={dashboardDetails.csPlacedStudents}
+                itPlacedStudents={dashboardDetails.itPlacedStudents}
+                entcPlacedStudents={dashboardDetails.entcPlacedStudents}
+              />
             </div>
-            <hr />
-            <div className="row">
-              <div className="col-md-4">
-                <BranchPieChart
-                  csPlacedStudents={dashboardDetials.csPlacedStudents}
-                  itPlacedStudents={dashboardDetials.itPlacedStudents}
-                  entcPlacedStudents={dashboardDetials.entcPlacedStudents}
-                />
-              </div>
-
-              {/* to be implemeneted in future */}
-
-              <div className="col-md-8">
-                <BarChart
-                  csPlacedStudents={dashboardDetials.csPlacedStudents}
-                  itPlacedStudents={dashboardDetials.itPlacedStudents}
-                  entcPlacedStudents={dashboardDetials.entcPlacedStudents}
-                />
-              </div>
+            <div className="col-md-8">
+              <BarChart
+                csPlacedStudents={dashboardDetails.csPlacedStudents}
+                itPlacedStudents={dashboardDetails.itPlacedStudents}
+                entcPlacedStudents={dashboardDetails.entcPlacedStudents}
+              />
             </div>
           </div>
         </div>
+      </div>
     </div>
   );
 }

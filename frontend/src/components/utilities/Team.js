@@ -1,81 +1,71 @@
+import React from "react";
 import "../../assets/css/team.css";
-import ved from "../../assets/img/ved.jpg"
-import devansh from "../../assets/img/devansh.jpeg"
-import sangmeshwar from "../../assets/img/sangmeshwar.jpg"
-import gaurav from "../../assets/img/gaurav.jpg"
-import kedar from "../../assets/img/kedar.jpg"
-import rohit from "../../assets/img/rohit.jpg"
-import vinayak from "../../assets/img/vinayak.JPG"
-import sudarshan from "../../assets/img/sudarshan.jpg"
-import harshal from "../../assets/img/harshal.jpg"
-import {Link} from "react-router-dom";
-import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Team = () => {
+  const teamMembers = [
+    {
+      name: "Training & Placement Officer",
+      role: "Head of T&P Cell",
+      email: "tpo@college.edu",
+      icon: "bi-person-badge",
+    },
+    {
+      name: "Assistant TPO",
+      role: "Corporate Relations",
+      email: "atpo@college.edu",
+      icon: "bi-person-lines-fill",
+    },
+    {
+      name: "Placement Coordinator",
+      role: "Student Relations & Operations",
+      email: "placements@college.edu",
+      icon: "bi-people-fill",
+    },
+  ];
 
-  const team = [
-
-    {src:vinayak, name: "Vinayak", desc: "Backend",git: "https://", linkedin: "https://www.linkedin.com", email: "mailto:@gmail.com"},
-
-  ]
-    return ( 
-      <>
+  return (
+    <>
       <div className="card text-center">
-                    <div className="card-body">
-                 <Link to="/" style={{textDecoration:"none",color:"gray"}}>  College TnP Platform </Link>
-                    </div>
-                </div>
+        <div className="card-body">
+          <Link to="/" style={{ textDecoration: "none", color: "gray" }}>
+            College TnP Platform
+          </Link>
+        </div>
+      </div>
 
       <section className="our-webcoderskull padding-lg">
-        
-      <div className="container">
-        <div className="row heading heading-icon">
-          <h2>Our Team</h2>
+        <div className="container">
+          <div className="row heading heading-icon">
+            <h2>T&P Cell Team</h2>
+          </div>
+          <ul className="row justify-content-center">
+            {teamMembers.map((member, idx) => (
+              <li className="col-12 col-md-6 col-lg-4" key={idx}>
+                <div className="cnt-block equal-hight" style={{ height: 349 }}>
+                  <figure>
+                    <i
+                      className={`bi ${member.icon}`}
+                      style={{ fontSize: "4rem", color: "#4e73df" }}
+                    ></i>
+                  </figure>
+                  <h3>{member.name}</h3>
+                  <p>{member.role}</p>
+                  <ul className="follow-us clearfix">
+                    <li>
+                      <a href={`mailto:${member.email}`}>
+                        <i className="bi bi-envelope"></i>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
-        <ul className="row">
-          {
-            team && team.map((t, key)=>
-              <li className="col-12 col-md-6 col-lg-3" key={key}>
-              <div className="cnt-block equal-hight" style={{ height: 349 }}>
-                <figure>
-                  <img
-                    src={t.src}
-                    className="img-responsive"
-                    alt=""
-                  />
-                </figure>
-                <h3>
-                  {t.name}
-                </h3>
-                <p>{t.desc}</p>
-                <ul className="follow-us clearfix">
-                  <li>
-                    <a href={t.git}>
-                        <i className="bi bi-github"></i>
-                    </a>
-                  </li>
-                  <li>
-                    <a href={t.linkedin}>
-                      <i className="bi bi-linkedin"></i>
-                    </a>
-                  </li>
-                  <li>
-                    <a href={t.email}>
-                      <i className="bi bi-envelope"></i>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </li>
-            )
-          }
-
-        </ul>
-      </div>
-    </section>
+      </section>
     </>
-    
-     );
-}
- 
+  );
+};
+
 export default Team;

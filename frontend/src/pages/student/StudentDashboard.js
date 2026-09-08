@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import API_BASE_URL from "../../config/api";
 import "../../assets/css/studentdashboardhome.css";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -9,14 +10,12 @@ export default function StudentDashboard() {
   const navigate = useNavigate();
   useEffect(() => {
     axios
-      .get("http://localhost:8080/student/company/job/applied", { withCredentials: true })
+      .get(`${API_BASE_URL}/student/company/job/applied`, { withCredentials: true })
       .then((res) => {
-        // console.log("After get request:", res.data.data);
-        setAppliedCompanies(res.data.data);
+        setAppliedCompanies(res.data.data || []);
         setLoading(false);
       })
       .catch((err) => {
-        // console.log("Error in get req:", err);
         setLoading(false);
       });
   }, []);

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../../assets/css/login.css'
-const axios = require('axios');
+import axios from 'axios';
+import '../../assets/css/login.css';
+import API_BASE_URL from '../../config/api';
 
-const AdminCompanyTable = () => {
+const AdminUpdatePassword = () => {
     const [curPass, setCurPass] = useState('');
     const [newPass, setnewPass] = useState('');
     const [confirmPass, setconfirmPass] = useState('');
@@ -12,49 +13,44 @@ const AdminCompanyTable = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        //validate whether newPass and confirmPass are same:
         if (newPass !== confirmPass) {
             alert('Passwords do not match!');
-            setnewPass(''); setconfirmPass('');
+            setnewPass('');
+            setconfirmPass('');
             return;
         }
 
-        //making an axios post request to backend to update the password:
-        const res = await axios.post(`http://localhost:8080/admin/password/update`, {
-            "oldPassword": curPass,
-            "newPassword": newPass,
-            "confirmPassword": confirmPass
-        }, { withCredentials: true }).catch((error)=>{
-            // console.log('eeee',error)
-            alert("Old Password did not matched");
-        });
+        try {
+            const res = await axios.post(`${API_BASE_URL}/admin/password/update`, {
+                oldPassword: curPass,
+                newPassword: newPass,
+                confirmPassword: confirmPass
+            }, { withCredentials: true });
 
-        if (res.status === 200 || res.status === 201) {
-            return navigate("/admin/dashboard");
-            // console.log('sucessful login')
-        } else {
-            alert("Email not sent!");
+            if (res.status === 200 || res.status === 201) {
+                alert("Password updated successfully!");
+                navigate("/admin/dashboard");
+            }
+        } catch (error) {
+            alert(error.response?.data?.message || "Old Password did not match");
         }
-        //navigate the user to signin page:
-
-    }
+    };
 
     return (
         <div>
             <div id="signInForm">
-            <main className="form-signin w-100 m-auto">
-                <form onSubmit={handleSubmit} >
-                    <h3 className="form-label">Update Password</h3>
+                <main className="form-signin w-100 m-auto">
+                    <form onSubmit={handleSubmit}>
+                        <h3 className="form-label">Update Password</h3>
                         <div className="form-group mt-3">
-                            <label>
-                                Current Password
-                            </label>
+                            <label>Current Password</label>
                             <input
                                 onChange={(e) => setCurPass(e.target.value)}
                                 value={curPass}
                                 type="password"
                                 className="form-control mt-1"
                                 placeholder="Enter Current Password"
+                                required
                             />
                         </div>
 
@@ -66,6 +62,7 @@ const AdminCompanyTable = () => {
                                 type="password"
                                 className="form-control mt-1"
                                 placeholder="Enter New Password"
+                                required
                             />
                         </div>
 
@@ -77,6 +74,7 @@ const AdminCompanyTable = () => {
                                 type="password"
                                 className="form-control mt-1"
                                 placeholder="Confirm New Password"
+                                required
                             />
                         </div>
 
@@ -85,11 +83,11 @@ const AdminCompanyTable = () => {
                                 Submit
                             </button>
                         </div>
-                </form>
+                    </form>
                 </main>
-                </div>
+            </div>
         </div>
-    )
-}
+    );
+};
 
-export default AdminCompanyTable;
+export default AdminUpdatePassword;

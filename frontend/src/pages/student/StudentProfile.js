@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
+import API_BASE_URL from '../../config/api';
 
 import "../../assets/css/studentprofile.css"
 
@@ -9,14 +10,12 @@ const StudentProfile = () => {
   const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('http://localhost:8080/student/me', { withCredentials: true })
+    axios.get(`${API_BASE_URL}/student/me`, { withCredentials: true })
       .then((res) => {
-        // console.log('After get request:', res.data);
-        setStudent(res.data.student);
+        setStudent(res.data.student || {});
         setLoading(false);
       })
       .catch((err) => {
-        // console.log('Error in get req:', err);
         setLoading(false);
       })
   }, []);

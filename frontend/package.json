@@ -1,7 +1,7 @@
 {
   "name": "tnp",
   "version": "0.1.0",
-  "proxy":"https://pict-tnp-backend2.herokuapp.com",
+  "proxy": "http://localhost:8080",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",
@@ -17,11 +17,9 @@
     "react-chartjs-2": "^4.3.1",
     "react-cookie": "^4.1.1",
     "react-dom": "^18.2.0",
-    "react-html-table-to-excel": "^2.0.0",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
     "react-table": "^7.8.0",
-    "react-toast-notifications": "^2.5.1",
     "styled-components": "^5.3.5",
     "swiper": "^8.3.2",
     "web-vitals": "^2.1.4",
