@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
+mongoose.set("strictQuery", false);
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
@@ -20,35 +21,55 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+let dbError = null;
+
 // Database connection helper with connection reuse for serverless
 const connectDB = async () => {
-  if (mongoose.connection.readyState >= 1) {
+  if (mongoose.connection.readyState === 1) {
     return;
   }
   if (!process.env.MONGODB_URL) {
-    console.warn("MONGODB_URL environment variable is missing!");
+    dbError = "MONGODB_URL is missing in environment variables";
+    console.error(dbError);
     return;
   }
   try {
     await mongoose.connect(process.env.MONGODB_URL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000, // 5s timeout to prevent Lambda kill
     });
+    dbError = null;
     console.log("Connected to MongoDB Database");
   } catch (err) {
+    dbError = err.message;
     console.error("Database connection failed:", err);
   }
 };
+
+// Health check endpoint (placed before DB middleware so it always returns immediately)
+app.get(["/api/health", "/health"], (req, res) => {
+  const dbStates = {
+    0: "disconnected",
+    1: "connected",
+    2: "connecting",
+    3: "disconnecting",
+  };
+  const dbStatus = dbStates[mongoose.connection.readyState] || "unknown";
+  res.status(200).json({
+    status: "ok",
+    message: "TPO Portal API is running",
+    database: dbStatus,
+    hasMongoUri: Boolean(process.env.MONGODB_URL),
+    dbError: dbError,
+    nodeEnv: process.env.NODE_ENV || "development",
+  });
+});
 
 // Middleware to ensure DB connection is ready before handling requests
 app.use(async (req, res, next) => {
   await connectDB();
   next();
-});
-
-// Health check endpoint
-app.get("/api/health", (req, res) => {
-  res.status(200).json({ status: "ok", message: "TPO Portal API is running" });
 });
 
 // Support both /api prefixed routes (for Vercel rewrites) and root routes

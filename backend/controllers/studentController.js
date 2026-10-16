@@ -1,6 +1,6 @@
 const Student = require("../models/student");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const Company = require("../models/company");
 const Job = require("../models/job");
 const Application = require("../models/application");
