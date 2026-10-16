@@ -31,11 +31,11 @@ let upload = multer({
       if (!job) {
         throw Error("Job Not Found");
       }
-      let path = `./uploads/${company.name}/${job.name}`;
+      const baseUploadDir = process.env.VERCEL ? "/tmp/uploads" : "./uploads";
+      let path = `${baseUploadDir}/${company.name}/${job.name}`;
       if (!fs.existsSync(path)) {
         fs.mkdirSync(path, { recursive: true });
       }
-      // console.log(path);
       cb(null, path);
     },
     filename: async (req, file, cb) => {
@@ -143,10 +143,11 @@ module.exports.add_job = async (req, res) => {
 module.exports.upload_job_files = async (req, res) => {
   upload(req, res, async () => {
     try {
+      const baseUploadDir = process.env.VERCEL ? "/tmp/uploads" : "./uploads";
       const jobFile = await JobFile.create({
         jobId: req.job._id,
         companyId: req.company._id,
-        path: `./uploads/${req.company.name}/${req.job.name}/${req.job.name}.pdf`,
+        path: `${baseUploadDir}/${req.company.name}/${req.job.name}/${req.job.name}.pdf`,
       });
       res.status(200).json({
         success: true,

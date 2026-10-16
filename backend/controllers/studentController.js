@@ -32,7 +32,8 @@ let upload = multer({
       req.company = company;
       let companyName = company.name;
       let jobName = job.name;
-      let path = `./uploads/${companyName}/${jobName}`;
+      const baseUploadDir = process.env.VERCEL ? "/tmp/uploads" : "./uploads";
+      let path = `${baseUploadDir}/${companyName}/${jobName}`;
       if (!fs.existsSync(path)) {
         fs.mkdirSync(path, { recursive: true });
       }
@@ -405,11 +406,12 @@ module.exports.resume_upload = async (req, res) => {
       });
       // console.log(resumeexists);
       if (resumeexists.length == 0) {
+        const baseUploadDir = process.env.VERCEL ? "/tmp/uploads" : "./uploads";
         const resume = await Resume.create({
           studentId: req.student._id,
           companyId: req.company._id,
           jobId: req.job._id,
-          file_path: `./uploads/${req.company.name}/${req.job.name}/${req.filename}.pdf`,
+          file_path: `${baseUploadDir}/${req.company.name}/${req.job.name}/${req.filename}.pdf`,
         });
         // console.log(resume);
         res.status(201).json({
@@ -544,7 +546,14 @@ module.exports.get_job_file = async (req, res) => {
     res.set({
       "Content-Type": "application/pdf",
     });
-    res.sendFile(path.join(__dirname, "..", jobFile.path));
+    const filePath = path.isAbsolute(jobFile.path)
+      ? jobFile.path
+      : path.join(__dirname, "..", jobFile.path);
+    if (fs.existsSync(filePath)) {
+      res.sendFile(filePath);
+    } else {
+      res.status(404).json({ success: false, message: "Job description file not found on server." });
+    }
   } catch (err) {
     console.log(err);
     res.status(404).json({
