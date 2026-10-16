@@ -1,3 +1,20 @@
-const app = require("../backend/app");
+let app;
+let initError = null;
 
-module.exports = app;
+try {
+  app = require("../backend/app");
+} catch (err) {
+  initError = err;
+  console.error("Initialization error:", err);
+}
+
+module.exports = (req, res) => {
+  if (initError) {
+    return res.status(500).json({
+      error: "Server Initialization Failed",
+      message: initError.message,
+      stack: initError.stack,
+    });
+  }
+  return app(req, res);
+};

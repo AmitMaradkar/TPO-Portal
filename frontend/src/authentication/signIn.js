@@ -59,8 +59,19 @@ const LoginForm = () => {
           navigate(`${usertype}/dashboard`);
         })
         .catch((err) => {
-          const errorMessage =
-            err.response?.data?.message || "Incorrect email and password combination!";
+          let errorMessage = "Incorrect email and password combination!";
+          if (err.response?.status >= 500) {
+            errorMessage = "Server error (" + err.response.status + "). Please check /api/health.";
+          } else if (err.response?.data?.error) {
+            errorMessage =
+              typeof err.response.data.error === "string"
+                ? err.response.data.error
+                : err.response.data.error.email ||
+                  err.response.data.error.password ||
+                  "Authentication failed";
+          } else if (err.response?.data?.message) {
+            errorMessage = err.response.data.message;
+          }
           setalertMessage({
             ...alertMessage,
             wholeAlert: "alert d-block alert-danger",
